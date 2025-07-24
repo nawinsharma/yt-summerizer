@@ -23,7 +23,7 @@ export default function UrlInput({ user, onSummaryAdded }: { user: { id: string 
       if (newChat) {
         if (onSummaryAdded) onSummaryAdded(newChat);
         toast.success("Url is correct redirecting you to the summarize window");
-        router.push(`/summarize/?id=${newChat.id}`);
+        router.push(`/summarize/${newChat.id}`);
       }
     } catch (error: unknown) {
       setLoading(false);

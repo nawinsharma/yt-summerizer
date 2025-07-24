@@ -65,7 +65,7 @@ export default function OldSummaryCard({
   // Make the card clickable except for the menu
   const handleCardClick = () => {
     if (menuOpen) return;
-    router.push(`/summarize?id=${summary.id}`);
+    router.push(`/summarize/${summary.id}`);
   };
 
   return (
