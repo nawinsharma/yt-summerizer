@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SumTube 🚀
 
-## Getting Started
+Hey there! 👋  
+**SumTube** is your new BFF for turning long, boring YouTube videos into quick, snappy summaries. No more wasting hours—get the main points in seconds, powered by AI. Perfect for students, hustlers, or anyone with zero patience for long videos.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Features (What You Get)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Paste a YouTube link** and boom—get a summary in seconds.
+- **AI-powered**: Uses OpenAI + LangChain to break down videos into bite-sized notes.
+- **Super fast**: No waiting around. Get your summary almost instantly.
+- **Key takeaways**: See the most important points, not just a wall of text.
+- **Q&A ready**: Get example questions and answers based on the video.
+- **Dashboard**: See all your past summaries in one place.
+- **Secure login**: Sign in with Google, your data is safe.
+- **Mobile-friendly**: Works on your phone, tablet, or laptop.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧑‍💻 Tech Stack
 
-## Learn More
+- **Next.js 15**
+  - Makes the app super fast and easy to scale.
+  - Handles routing, SSR, and API routes all in one.
 
-To learn more about Next.js, take a look at the following resources:
+- **OpenAI + LangChain**
+  - Does the heavy lifting for summarizing videos.
+  - Turns transcripts into smart, readable notes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Better-Auth**
+  - Handles credenential and social login sign-in, sign-up, and keeps your stuff secure.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Prisma**
+  - Handles all the database stuff.
+  - Makes saving and fetching summaries a breeze.
 
-## Deploy on Vercel
+- **PostgreSQL**
+  - Stores all your summaries and user data safely.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **TailwindCSS**
+  - Makes the UI look clean and modern, fast.
+  - No more fighting with CSS.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **ShadCN UI**
+  - Gives you beautiful, ready-to-use components.
+
+
+---
+
+## 🛠️ How to use
+
+1. **Clone this repo**  
+   `git clone https://github.com/nawinsharma/yt-summerizer.git`
+
+2. **Install the stuff**  
+   `pnpm install` (or use `npm`, `yarn`, or `bun` if you vibe with those)
+
+3. **Run it**  
+   `pnpm dev`  
+   Then open [http://localhost:3000](http://localhost:3000) in your browser.
+
+4. **Paste a YouTube link**  
+   Drop your link in, hit summarize, and chill while the AI does its thing.
+
+---
+
+## 💡 Why use SumTube?
+
+- Hate long videos? This is for you.
+- Need notes for class or work? Sorted.
+- Want to look smart without watching the whole thing? We got you.
+
+
+---
+
+## 🙌 Author
+
+Made with ❤️ by [Nawin](https://nawin.xyz).  
+Check out the [GitHub](https://github.com/nawinsharma/yt-summerizer) for more.
+
+---
+
+## ⚡️ TL;DR
+
+Paste a YouTube link.  
+Get a summary.  
+Save time.  
+Thank us later. 😎
