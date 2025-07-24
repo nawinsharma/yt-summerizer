@@ -16,7 +16,6 @@ import SignOutForm from '@/components/sign-out-form';
 import Link from 'next/link';
 import Logo from './logo';
 import { usePathname } from 'next/navigation';
-import UserAvatar from './common/UserAvatar';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -25,8 +24,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "./ui/button";
-import Image from "next/image";
 
 export function Nav() {
   const { data: session } = authClient.useSession();

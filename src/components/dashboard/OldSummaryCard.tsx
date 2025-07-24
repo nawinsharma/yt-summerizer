@@ -50,6 +50,12 @@ export default function OldSummaryCard({
   const [loading, setLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Early return if summary is invalid
+  if (!summary || !summary.id) {
+    console.error('OldSummaryCard: Invalid summary data provided');
+    return null;
+  }
+
   const handleDelete = async () => {
     setLoading(true);
     try {
@@ -129,8 +135,8 @@ export default function OldSummaryCard({
       {/* Card content */}
       <div className="p-4 h-full flex flex-col rounded-3xl">
         {/* Title */}
-        <h3 className="text-xl font-bold relative z-20 mb-3 text-white line-clamp-2 leading-tight" title={summary.title || ''}>
-          {summary.title}
+        <h3 className="text-xl font-bold relative z-20 mb-3 text-white line-clamp-2 leading-tight" title={summary.title || 'Untitled'}>
+          {summary.title || ''}
         </h3>
         
         {/* Author and View Count */}
@@ -160,19 +166,21 @@ export default function OldSummaryCard({
             <ExternalLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
             <span
               className="text-sm text-blue-400 hover:underline cursor-pointer line-clamp-2 leading-relaxed"
-              title={summary.url || ''}
-              onClick={e => { e.stopPropagation(); window.open(summary.url, '_blank'); }}
+              title={summary.url || 'No URL'}
+              onClick={e => { e.stopPropagation(); if (summary.url) window.open(summary.url, '_blank'); }}
               tabIndex={0}
               role="link"
             >
-              {summary.url}
+              {summary.url || 'No URL'}
             </span>
           </div>
         </div>
         
         {/* Created At */}
         <div className="text-neutral-400 relative z-20 text-sm mt-auto">
-          Created: <span className="font-medium">{new Date(summary.created_at).toLocaleDateString()}</span>
+          Created: <span className="font-medium">
+            {summary.created_at ? new Date(summary.created_at).toLocaleDateString() : 'Unknown date'}
+          </span>
         </div>
       </div>
     </CardSpotlight>

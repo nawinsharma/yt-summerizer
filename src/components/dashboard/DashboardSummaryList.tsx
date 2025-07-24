@@ -15,6 +15,15 @@ export default function DashboardSummaryList({ user }: { user: User }) {
   const fetchSummaries = useCallback(async () => {
     try {
       setError(null);
+      
+      // Add null check for user and user.id
+      if (!user || !user.id) {
+        console.error('DashboardSummaryList: Invalid user data');
+        setError('Invalid user data. Please sign in again.');
+        setSummaries([]);
+        return;
+      }
+      
       const data = await getUserOldSummaries(user.id);
       setSummaries(data || []);
     } catch (err) {
@@ -24,16 +33,23 @@ export default function DashboardSummaryList({ user }: { user: User }) {
     } finally {
       setLoading(false);
     }
-  }, [user.id]);
+  }, [user?.id]);
 
   useEffect(() => {
+    // Check if user exists before proceeding
+    if (!user || !user.id) {
+      setError('Invalid user data. Please sign in again.');
+      setLoading(false);
+      return;
+    }
+    
     // Add a small delay to prevent flash of loading state
     const timer = setTimeout(() => {
       fetchSummaries();
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [fetchSummaries]);
+  }, [fetchSummaries, user]);
 
   // Called when a new summary is added
   const handleSummaryAdded = (newSummary: UserSummaries) => {
@@ -44,6 +60,19 @@ export default function DashboardSummaryList({ user }: { user: User }) {
   const handleSummaryDeleted = (id: string) => {
     setSummaries((prev) => prev.filter((item) => item.id !== id));
   };
+
+  // Early return for invalid user
+  if (!user || !user.id) {
+    return (
+      <div className="container flex flex-col items-center justify-center mx-auto">
+        <div className="mt-10 w-full">
+          <div className="text-center text-red-400 py-12">
+            <p className="text-xl mb-4">Invalid user data. Please sign in again.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

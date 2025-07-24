@@ -6,20 +6,44 @@ import { getYouTubeVideoTitle } from "@/lib/youtube";
 import { debugLog, productionLog, errorLog, getEnvironmentInfo } from "@/lib/debug";
 
 export async function getUserOldSummaries(id: string) {
-  return await prisma.summary.findMany({
-    where: { user_id: id },
-    select: { id: true, url: true, created_at: true, title: true, author: true, view_count: true },
-    orderBy: { created_at: "desc" },
-  });
+  try {
+    if (!id) {
+      console.error('getUserOldSummaries: Invalid user ID provided');
+      return [];
+    }
+    
+    const summaries = await prisma.summary.findMany({
+      where: { user_id: id },
+      select: { id: true, url: true, created_at: true, title: true, author: true, view_count: true },
+      orderBy: { created_at: "desc" },
+    });
+    
+    return summaries || [];
+  } catch (error) {
+    console.error('Error fetching user summaries:', error);
+    // Return empty array instead of throwing to prevent server crash
+    return [];
+  }
 }
 
 export async function getSummary(id: string): Promise<ChatType | null> {
-  const summary = await prisma.summary.findUnique({
-    where: {
-      id: id,
-    },
-  });
-  return summary;
+  try {
+    if (!id) {
+      console.error('getSummary: Invalid summary ID provided');
+      return null;
+    }
+    
+    const summary = await prisma.summary.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return summary;
+  } catch (error) {
+    console.error('Error fetching summary:', error);
+    // Return null instead of throwing to prevent server crash
+    return null;
+  }
 }
 
 export async function addSummary({ url, user_id }: { url: string; user_id: string }) {
