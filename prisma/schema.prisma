@@ -18,7 +18,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
-
+  summaries     Summary[]
   @@map("user")
 }
 
@@ -65,4 +65,18 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+
+model Summary {
+  id         String      @id @default(uuid()) @db.Uuid
+  user       User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String
+  title      String
+  url        String
+  response   String?     @db.Text
+  created_at DateTime    @default(now())
+
+  @@index([created_at, url])
+  @@map("chats")
 }

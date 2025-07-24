@@ -1,10 +1,8 @@
-import { SidebarProvider } from "@/components/ui/sidebar"
-import AppSidebar from "@/components/app-sidebar"
-import AppHeader from "@/components/app-header"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { UserProvider } from "@/context/UserContext"
+import GlobalBackground from '@/components/GlobalBackground';
 
 
 export default async function DashboardLayout({
@@ -22,17 +20,14 @@ export default async function DashboardLayout({
 
    const user = session?.user;
    return (
-      <SidebarProvider>
-         <UserProvider user={user}>
-            <div className="flex min-h-screen w-full">
-               <AppSidebar user={user} />
-               <div className="w-full flex flex-1 flex-col">
-                  <AppHeader />
-                  <main className="flex-1 p-6">{children}</main>
-               </div>
+      <UserProvider user={user}>
+         <GlobalBackground />
+         <div className="flex min-h-screen w-full">
+            <div className="w-full flex flex-1 flex-col">
+               <main className="flex-1 p-6">{children}</main>
             </div>
-         </UserProvider>
-      </SidebarProvider>
+         </div>
+      </UserProvider>
    )
 }
 
