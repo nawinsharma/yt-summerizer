@@ -1,9 +1,8 @@
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
-export const gptModal = new ChatOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  model: "gpt-4o-mini",
+export const gptModal = new ChatGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  model: "gemini-1.5-flash",
   temperature: 0.3,
-  streaming: true,
-  maxTokens: 16000,
+  maxOutputTokens: 16000,
 });
