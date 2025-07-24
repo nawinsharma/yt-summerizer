@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import type { Document as LangchainDocument } from "@langchain/core/documents";
 import { ChatType } from "@/types";
+import { getYouTubeVideoTitle, getYouTubeVideoTitleOEmbed } from "@/lib/youtube";
 
 export async function getUserOldSummaries(id: string) {
   return await prisma.summary.findMany({
@@ -23,6 +24,8 @@ export async function getSummary(id: string): Promise<ChatType | null> {
 export async function addSummary({ url, user_id }: { url: string; user_id: string }) {
   const { YoutubeLoader } = await import("@langchain/community/document_loaders/web/youtube");
   let text: LangchainDocument<Record<string, unknown>>[] = [];
+  let videoTitle = "No Title found!";
+  
   try {
     const loader = YoutubeLoader.createFromUrl(url, {
       language: "en",
@@ -32,11 +35,29 @@ export async function addSummary({ url, user_id }: { url: string; user_id: strin
   } catch {
     throw new Error("No transcript available for this video. Please try another video.");
   }
+
+  // Try to get title using our robust method
+  try {
+    videoTitle = await getYouTubeVideoTitle(url);
+  } catch (titleError) {
+    console.error("Primary title extraction failed:", titleError);
+    
+    // Fallback to oEmbed method
+    try {
+      videoTitle = await getYouTubeVideoTitleOEmbed(url);
+    } catch (oembedError) {
+      console.error("oEmbed title extraction failed:", oembedError);
+      
+      // Final fallback to YoutubeLoader metadata if available
+      videoTitle = (text[0]?.metadata?.title as string) ?? "No Title found!";
+    }
+  }
+  
   const chat = await prisma.summary.create({
     data: {
       url,
       user_id,
-      title: (text[0]?.metadata?.title as string) ?? "No Title found!",
+      title: videoTitle,
     },
   });
   return chat;
