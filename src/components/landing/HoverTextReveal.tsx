@@ -6,7 +6,14 @@ const PROXIMITY_RADIUS = 200;
 
 declare global {
   interface Window {
-    gsap?: any;
+    gsap?: {
+      set: (el: Element, props: Record<string, unknown>) => void;
+      to: (el: Element, props: Record<string, unknown>) => void;
+      utils: {
+        mapRange: (inMin: number, inMax: number, outMin: number, outMax: number) => (value: number) => number;
+        clamp: (min: number, max: number, value: number) => number;
+      };
+    };
   }
 }
 
