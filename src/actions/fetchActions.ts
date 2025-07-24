@@ -2,12 +2,13 @@
 import prisma from "@/lib/prisma";
 import type { Document as LangchainDocument } from "@langchain/core/documents";
 import { ChatType } from "@/types";
-import { getYouTubeVideoTitle, getYouTubeVideoTitleOEmbed, getYouTubeVideoTitleMetaData } from "@/lib/youtube";
+import { getYouTubeVideoTitle } from "@/lib/youtube";
+import { debugLog, productionLog, errorLog, getEnvironmentInfo } from "@/lib/debug";
 
 export async function getUserOldSummaries(id: string) {
   return await prisma.summary.findMany({
     where: { user_id: id },
-    select: { id: true, url: true, created_at: true, title: true },
+    select: { id: true, url: true, created_at: true, title: true, author: true, view_count: true },
     orderBy: { created_at: "desc" },
   });
 }
@@ -25,6 +26,10 @@ export async function addSummary({ url, user_id }: { url: string; user_id: strin
   const { YoutubeLoader } = await import("@langchain/community/document_loaders/web/youtube");
   let text: LangchainDocument<Record<string, unknown>>[] = [];
   let videoTitle = "No Title found!";
+  let videoAuthor: string | null = null;
+  let viewCount: number | null = null;
+  
+  productionLog(`Starting title extraction for URL: ${url}`, getEnvironmentInfo());
   
   try {
     const loader = YoutubeLoader.createFromUrl(url, {
@@ -32,41 +37,61 @@ export async function addSummary({ url, user_id }: { url: string; user_id: strin
       addVideoInfo: true,
     });
     text = await loader.load();
-  } catch {
+    debugLog(`YoutubeLoader successfully loaded transcript`);
+    
+    // Extract metadata from YoutubeLoader
+    const metadata = text[0]?.metadata;
+    if (metadata) {
+      videoAuthor = (metadata.author as string) || null;
+      viewCount = (metadata.view_count as number) || null;
+      debugLog(`Extracted metadata - Author: ${videoAuthor}, Views: ${viewCount}`);
+    }
+  } catch (loaderError) {
+    errorLog(`YoutubeLoader failed`, loaderError);
     throw new Error("No transcript available for this video. Please try another video.");
   }
 
-  // Try to get title using our robust method (includes youtubei.js + youtube-meta-data + oEmbed)
+  // Try to get title using our robust method
   try {
+    debugLog(`Starting title extraction...`);
     videoTitle = await getYouTubeVideoTitle(url);
-  } catch (titleError) {
-    console.error("Primary title extraction failed:", titleError);
+    productionLog(`Title extraction result: "${videoTitle}"`);
     
-    // Fallback to youtube-meta-data method specifically
-    try {
-      videoTitle = await getYouTubeVideoTitleMetaData(url);
-    } catch (metaDataError) {
-      console.error("youtube-meta-data title extraction failed:", metaDataError);
-      
-      // Fallback to oEmbed method
-      try {
-        videoTitle = await getYouTubeVideoTitleOEmbed(url);
-      } catch (oembedError) {
-        console.error("oEmbed title extraction failed:", oembedError);
-        
-        // Final fallback to YoutubeLoader metadata if available
-        videoTitle = (text[0]?.metadata?.title as string) ?? "No Title found!";
+    if (videoTitle === "No Title Found") {
+      debugLog(`Primary title extraction failed, trying YoutubeLoader metadata...`);
+      // Last resort: try YoutubeLoader metadata
+      const loaderTitle = (text[0]?.metadata?.title as string);
+      if (loaderTitle && loaderTitle.trim()) {
+        videoTitle = loaderTitle;
+        productionLog(`Using YoutubeLoader metadata title: "${videoTitle}"`);
       }
     }
+  } catch (titleError) {
+    errorLog(`All title extraction methods failed`, titleError);
+    
+    // Final fallback to YoutubeLoader metadata if available
+    const loaderTitle = (text[0]?.metadata?.title as string);
+    if (loaderTitle && loaderTitle.trim()) {
+      videoTitle = loaderTitle;
+      productionLog(`Using YoutubeLoader metadata as final fallback: "${videoTitle}"`);
+    } else {
+      debugLog(`No title could be extracted, using default`);
+    }
   }
+  
+  productionLog(`Final metadata - Title: "${videoTitle}", Author: ${videoAuthor}, Views: ${viewCount}`);
   
   const chat = await prisma.summary.create({
     data: {
       url,
       user_id,
       title: videoTitle,
+      author: videoAuthor,
+      view_count: viewCount,
     },
   });
+  
+  debugLog(`Summary created with ID: ${chat.id}`);
   return chat;
 }
 

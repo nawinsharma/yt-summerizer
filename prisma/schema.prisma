@@ -73,6 +73,8 @@ model Summary {
   user       User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id    String
   title      String
+  author     String?
+  view_count Int?
   url        String
   response   String?     @db.Text
   created_at DateTime    @default(now())

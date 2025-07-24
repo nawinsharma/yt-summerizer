@@ -1,7 +1,7 @@
 "use client";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
 import React from "react";
-import { ExternalLink, MoreVertical, Trash2 } from "lucide-react";
+import { ExternalLink, MoreVertical, Trash2, User, Eye } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -24,6 +24,19 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { UserSummaries } from "@/types";
+
+// Helper function to format view count
+const formatViewCount = (count?: number | null): string => {
+  if (!count || count === 0) return "0 views";
+  
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M views`;
+  } else if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K views`;
+  } else {
+    return `${count} views`;
+  }
+};
 
 export default function OldSummaryCard({
   summary,
@@ -69,34 +82,29 @@ export default function OldSummaryCard({
   };
 
   return (
-    <CardSpotlight
-      className="h-56 w-full flex flex-col justify-between relative cursor-pointer transition-shadow hover:shadow-2xl group"
-      onClick={handleCardClick}
-      tabIndex={0}
-      role="button"
-      aria-label={`View summary for ${summary.title}`}
-    >
-      {/* Three-dot menu */}
-      <div className="absolute top-2 right-2 z-30 card-menu">
+    <CardSpotlight onClick={handleCardClick} className="h-[320px] w-full cursor-pointer hover:scale-105 transition-transform duration-200">
+      {/* Menu Button */}
+      <div className="absolute top-4 right-4 z-30">
         <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={e => e.stopPropagation()}>
-              <MoreVertical className="w-5 h-5" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-gray-700"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuOpen(!menuOpen);
+              }}
+            >
+              <MoreVertical className="h-4 w-4 text-gray-400" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
-            <AlertDialog open={dialogOpen} onOpenChange={open => { setDialogOpen(open); setMenuOpen(open); }}>
+            <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <AlertDialogTrigger asChild>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onSelect={e => {
-                    e.preventDefault();
-                    setDialogOpen(true);
-                    setMenuOpen(true);
-                  }}
-                  className="text-red-600"
-                >
-                  <Trash2 className="w-4 h-4 mr-2 cursor-pointer" /> Delete
+                <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setDialogOpen(true); }} className="text-red-600 cursor-pointer">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
                 </DropdownMenuItem>
               </AlertDialogTrigger>
               <AlertDialogContent onClick={e => e.stopPropagation()}>
@@ -117,27 +125,56 @@ export default function OldSummaryCard({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      
       {/* Card content */}
-      <p className="text-xl font-bold relative z-20 mt-2 text-white dark:text-white truncate" title={summary.title || ''}>
-        {summary.title}
-      </p>
-      <div className="text-neutral-200 dark:text-neutral-300 mt-2 relative z-20">
-        <div className="flex items-center gap-1 w-full">
-          <ExternalLink className="h-4 w-4 flex-shrink-0" />
-          <span
-            className="truncate max-w-full block text-blue-400 dark:text-blue-300 hover:underline cursor-pointer"
-            title={summary.url || ''}
-            onClick={e => { e.stopPropagation(); window.open(summary.url, '_blank'); }}
-            tabIndex={0}
-            role="link"
-          >
-            {summary.url}
-          </span>
+      <div className="p-4 h-full flex flex-col rounded-3xl">
+        {/* Title */}
+        <h3 className="text-xl font-bold relative z-20 mb-3 text-white line-clamp-2 leading-tight" title={summary.title || ''}>
+          {summary.title}
+        </h3>
+        
+        {/* Author and View Count */}
+        <div className="text-neutral-200 mb-4 relative z-20 space-y-2">
+          {summary.author && (
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 flex-shrink-0 text-gray-400" />
+              <span className="text-sm text-gray-300 truncate" title={summary.author}>
+                {summary.author}
+              </span>
+            </div>
+          )}
+          
+          {summary.view_count !== null && summary.view_count !== undefined && (
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4 flex-shrink-0 text-gray-400" />
+              <span className="text-sm text-gray-300">
+                {formatViewCount(summary.view_count)}
+              </span>
+            </div>
+          )}
+        </div>
+        
+        {/* URL */}
+        <div className="text-neutral-200 mb-4 relative z-20 flex-1">
+          <div className="flex items-center gap-2">
+            <ExternalLink className="h-4 w-4 flex-shrink-0 text-gray-400" />
+            <span
+              className="text-sm text-blue-400 hover:underline cursor-pointer line-clamp-2 leading-relaxed"
+              title={summary.url || ''}
+              onClick={e => { e.stopPropagation(); window.open(summary.url, '_blank'); }}
+              tabIndex={0}
+              role="link"
+            >
+              {summary.url}
+            </span>
+          </div>
+        </div>
+        
+        {/* Created At */}
+        <div className="text-neutral-400 relative z-20 text-sm mt-auto">
+          Created: <span className="font-medium">{new Date(summary.created_at).toLocaleDateString()}</span>
         </div>
       </div>
-      <p className="text-neutral-300 dark:text-neutral-400 mt-4 relative z-20 text-sm">
-        Created At: <span className="font-medium">{new Date(summary.created_at).toLocaleDateString()}</span>
-      </p>
     </CardSpotlight>
   );
 }

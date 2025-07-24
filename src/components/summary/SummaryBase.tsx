@@ -7,8 +7,22 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { User, Eye } from "lucide-react";
 import { summarizeUrl } from "@/actions/fetchActions";
 import { ChatType } from "@/types";
+
+// Helper function to format view count
+const formatViewCount = (count?: number | null): string => {
+  if (!count || count === 0) return "0 views";
+  
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M views`;
+  } else if (count >= 1000) {
+    return `${(count / 1000).toFixed(1)}K views`;
+  } else {
+    return `${count} views`;
+  }
+};
 
 export default function SummaryBase({ summary }: { summary: ChatType | null }) {
   const [loading, setLoading] = useState(true);
@@ -91,6 +105,7 @@ export default function SummaryBase({ summary }: { summary: ChatType | null }) {
           </svg>
           Back
         </Button>
+        
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-4 mb-6">
@@ -98,7 +113,29 @@ export default function SummaryBase({ summary }: { summary: ChatType | null }) {
               {summary.title || "Untitled"}
             </h1>
           </div>
-          {/* YouTube Preview (moved here) */}
+          
+          {/* Video Metadata */}
+          <div className="mb-6 space-y-3">
+            {summary.author && (
+              <div className="flex items-center gap-3">
+                <User className="h-5 w-5 text-gray-400" />
+                <span className="text-lg text-gray-300 font-medium">
+                  {summary.author}
+                </span>
+              </div>
+            )}
+            
+            {summary.view_count !== null && summary.view_count !== undefined && (
+              <div className="flex items-center gap-3">
+                <Eye className="h-5 w-5 text-gray-400" />
+                <span className="text-lg text-gray-300">
+                  {formatViewCount(summary.view_count)}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          {/* YouTube Preview */}
           {summary.url && getYouTubeId(summary.url) && (
             <div className="mb-6 flex justify-center">
               <div className="w-full max-w-2xl aspect-video rounded-xl overflow-hidden border border-gray-700 shadow-lg">
@@ -117,6 +154,7 @@ export default function SummaryBase({ summary }: { summary: ChatType | null }) {
               </div>
             </div>
           )}
+          
           {summary.url && (
             <Badge className="bg-blue-950 text-blue-200 border-blue-900 px-4 py-2 text-sm">
               <Link
@@ -130,6 +168,7 @@ export default function SummaryBase({ summary }: { summary: ChatType | null }) {
             </Badge>
           )}
         </div>
+        
         {/* Content */}
         <div className="bg-gray-950 max-w-9xl mx-auto rounded-2xl p-8 border border-gray-600 shadow-xl">
           {loading ? (
@@ -179,27 +218,21 @@ export default function SummaryBase({ summary }: { summary: ChatType | null }) {
                   li: ({ ...props }) => (
                     <li className="text-white leading-relaxed" {...props} />
                   ),
-                  a: ({ ...props }) => (
-                    <a
-                      className="text-blue-400 underline hover:text-blue-300"
-                      {...props}
-                    />
-                  ),
                   blockquote: ({ ...props }) => (
                     <blockquote
-                      className="border-l-4 border-purple-500 pl-4 italic text-purple-200 my-4 bg-purple-900/20"
+                      className="border-l-4 border-blue-400 pl-4 italic text-blue-200 my-4"
                       {...props}
                     />
                   ),
                   code: ({ ...props }) => (
                     <code
-                      className="bg-gray-800 text-green-400 px-2 py-1 rounded text-sm"
+                      className="bg-gray-800 text-green-300 px-2 py-1 rounded text-sm"
                       {...props}
                     />
                   ),
                   pre: ({ ...props }) => (
                     <pre
-                      className="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto my-4 border border-gray-600"
+                      className="bg-gray-800 text-green-300 p-4 rounded-lg overflow-x-auto my-4"
                       {...props}
                     />
                   ),
@@ -210,7 +243,7 @@ export default function SummaryBase({ summary }: { summary: ChatType | null }) {
             </div>
           ) : (
             <div className="text-center text-white py-12">
-              <p className="text-xl">No summary available.</p>
+              <p className="text-xl">No summary available yet.</p>
             </div>
           )}
         </div>
