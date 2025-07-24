@@ -9,8 +9,8 @@ import {
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
-   } from "@/components/landing/resizable-navbar";
-   import { useState } from "react";
+} from "@/components/landing/resizable-navbar";
+import { useState } from "react";
 import { authClient } from '@/lib/auth-client';
 import SignOutForm from '@/components/sign-out-form';
 import Link from 'next/link';
@@ -25,6 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "./ui/button";
+import Image from "next/image";
 
 export function Nav() {
   const { data: session } = authClient.useSession();
@@ -52,7 +54,16 @@ export function Nav() {
         {/* Desktop Navigation */}
         <NavBody>
           <div className="flex items-center">
-            <Logo />
+            {/* Logo with red YouTube icon */}
+            <Link href="/" className="flex items-center gap-2 self-center font-medium">
+              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                {/* YouTube icon in red */}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FF0000" className="size-4">
+                  <path d="M23.498 6.186a2.994 2.994 0 0 0-2.107-2.117C19.185 3.5 12 3.5 12 3.5s-7.185 0-9.391.569A2.994 2.994 0 0 0 .502 6.186C0 8.4 0 12 0 12s0 3.6.502 5.814a2.994 2.994 0 0 0 2.107 2.117C4.815 20.5 12 20.5 12 20.5s7.185 0 9.391-.569a2.994 2.994 0 0 0 2.107-2.117C24 15.6 24 12 24 12s0-3.6-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+              </div>
+              <span className="text-xl font-bold">SumTube</span>
+            </Link>
           </div>
           <NavItems items={navItems} />
           <div className="relative z-[70] flex items-center gap-2">
@@ -61,8 +72,20 @@ export function Nav() {
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="focus:outline-none">
-                      <UserAvatar image={user.image || ''} name={user.name || user.email || 'U'} />
+                    <button className="focus:outline-none cursor-pointer">
+                      {/* Show user's profile image if available, fallback to first letter of name/email */}
+                      {user.image && user.image.startsWith('http') ? (
+                        <img
+                          src={user.image}
+                          alt={user.name || user.email || 'User'}
+                          className="h-8 w-8 rounded-full object-cover border border-gray-300"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-blue-700 flex items-center justify-center text-white font-bold text-lg border border-gray-300">
+                          {(user.name || user.email || 'U').charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
