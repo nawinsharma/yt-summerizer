@@ -2,7 +2,7 @@
 import prisma from "@/lib/prisma";
 import type { Document as LangchainDocument } from "@langchain/core/documents";
 import { ChatType } from "@/types";
-import { getYouTubeVideoTitle, getYouTubeVideoTitleOEmbed } from "@/lib/youtube";
+import { getYouTubeVideoTitle, getYouTubeVideoTitleOEmbed, getYouTubeVideoTitleMetaData } from "@/lib/youtube";
 
 export async function getUserOldSummaries(id: string) {
   return await prisma.summary.findMany({
@@ -36,20 +36,27 @@ export async function addSummary({ url, user_id }: { url: string; user_id: strin
     throw new Error("No transcript available for this video. Please try another video.");
   }
 
-  // Try to get title using our robust method
+  // Try to get title using our robust method (includes youtubei.js + youtube-meta-data + oEmbed)
   try {
     videoTitle = await getYouTubeVideoTitle(url);
   } catch (titleError) {
     console.error("Primary title extraction failed:", titleError);
     
-    // Fallback to oEmbed method
+    // Fallback to youtube-meta-data method specifically
     try {
-      videoTitle = await getYouTubeVideoTitleOEmbed(url);
-    } catch (oembedError) {
-      console.error("oEmbed title extraction failed:", oembedError);
+      videoTitle = await getYouTubeVideoTitleMetaData(url);
+    } catch (metaDataError) {
+      console.error("youtube-meta-data title extraction failed:", metaDataError);
       
-      // Final fallback to YoutubeLoader metadata if available
-      videoTitle = (text[0]?.metadata?.title as string) ?? "No Title found!";
+      // Fallback to oEmbed method
+      try {
+        videoTitle = await getYouTubeVideoTitleOEmbed(url);
+      } catch (oembedError) {
+        console.error("oEmbed title extraction failed:", oembedError);
+        
+        // Final fallback to YoutubeLoader metadata if available
+        videoTitle = (text[0]?.metadata?.title as string) ?? "No Title found!";
+      }
     }
   }
   

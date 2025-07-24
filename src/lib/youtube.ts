@@ -19,7 +19,18 @@ export async function getYouTubeVideoTitle(url: string): Promise<string> {
   } catch (error) {
     console.error('Error fetching YouTube video title:', error);
     
-    // Fallback: Try to get title from YouTube oEmbed API
+    // Fallback 1: Try youtube-meta-data package
+    try {
+      const youtubeMetaData = (await import('youtube-meta-data')).default;
+      const metaData = await youtubeMetaData(url);
+      if (metaData && metaData.title) {
+        return metaData.title;
+      }
+    } catch (metaDataError) {
+      console.error('Error with youtube-meta-data fallback:', metaDataError);
+    }
+    
+    // Fallback 2: Try to get title from YouTube oEmbed API
     try {
       const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
       const response = await fetch(oembedUrl);
@@ -68,6 +79,23 @@ export async function getYouTubeVideoTitleOEmbed(url: string): Promise<string> {
     return data.title || 'No Title Found';
   } catch (error) {
     console.error('Error fetching YouTube video title via oEmbed:', error);
+    return 'No Title Found';
+  }
+}
+
+// Function specifically using youtube-meta-data package
+export async function getYouTubeVideoTitleMetaData(url: string): Promise<string> {
+  try {
+    const youtubeMetaData = (await import('youtube-meta-data')).default;
+    const metaData = await youtubeMetaData(url);
+    
+    if (metaData && metaData.title) {
+      return metaData.title;
+    }
+    
+    throw new Error('No title found in metadata');
+  } catch (error) {
+    console.error('Error fetching YouTube video title via youtube-meta-data:', error);
     return 'No Title Found';
   }
 } 
