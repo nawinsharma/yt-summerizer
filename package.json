@@ -29,6 +29,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@react-three/fiber": "9.0.0-alpha.8",
     "@tabler/icons-react": "^3.34.1",
+    "@vercel/analytics": "^1.5.0",
     "alert": "^6.0.2",
     "axios": "^1.10.0",
     "better-auth": "^1.3.2",

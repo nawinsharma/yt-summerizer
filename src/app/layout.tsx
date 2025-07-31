@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Nav } from "@/components/navbar";
 import GlobalBackground from '@/components/GlobalBackground';
 import ConditionalFooter from '@/components/ConditionalFooter';
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "SumTube",
@@ -19,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="dark antialiased">
+        <Analytics />
         <GlobalBackground />
         <NextTopLoader showSpinner={false} height={6} color="#000000" />
         <main className="h-screen">
