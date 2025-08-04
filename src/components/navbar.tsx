@@ -24,6 +24,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 export function Nav() {
   const { data: session } = authClient.useSession();
@@ -72,8 +73,10 @@ export function Nav() {
                     <button className="focus:outline-none cursor-pointer">
                       {/* Show user's profile image if available, fallback to first letter of name/email */}
                       {user.image && user.image.startsWith('http') ? (
-                        <img
+                        <Image
                           src={user.image}
+                          width={32}
+                          height={32}
                           alt={user.name || user.email || 'User'}
                           className="h-8 w-8 rounded-full object-cover border border-gray-300"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
