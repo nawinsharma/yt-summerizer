@@ -54,7 +54,8 @@
     "youtube-meta-data": "^0.1.6",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^15.0.1",
-    "zod": "^4.0.5"
+    "zod": "^4.0.5",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

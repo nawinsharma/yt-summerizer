@@ -4,27 +4,35 @@ import type { Document as LangchainDocument } from "@langchain/core/documents";
 import { ChatType } from "@/types";
 import { getYouTubeVideoTitle } from "@/lib/youtube";
 import { debugLog, productionLog, errorLog, getEnvironmentInfo } from "@/lib/debug";
+import { unstable_cache } from "next/cache";
 
-export async function getUserOldSummaries(id: string) {
-  try {
-    if (!id) {
-      console.error('getUserOldSummaries: Invalid user ID provided');
+export const getUserOldSummaries = unstable_cache(
+  async (id: string) => {
+    try {
+      if (!id) {
+        console.error('getUserOldSummaries: Invalid user ID provided');
+        return [];
+      }
+      
+      const summaries = await prisma.summary.findMany({
+        where: { user_id: id },
+        select: { id: true, url: true, created_at: true, title: true, author: true, view_count: true },
+        orderBy: { created_at: "desc" },
+      });
+      
+      return summaries || [];
+    } catch (error) {
+      console.error('Error fetching user summaries:', error);
+      // Return empty array instead of throwing to prevent server crash
       return [];
     }
-    
-    const summaries = await prisma.summary.findMany({
-      where: { user_id: id },
-      select: { id: true, url: true, created_at: true, title: true, author: true, view_count: true },
-      orderBy: { created_at: "desc" },
-    });
-    
-    return summaries || [];
-  } catch (error) {
-    console.error('Error fetching user summaries:', error);
-    // Return empty array instead of throwing to prevent server crash
-    return [];
+  },
+  ['user-summaries'],
+  {
+    revalidate: 300, // Cache for 5 minutes
+    tags: ['user-summaries']
   }
-}
+);
 
 export async function getSummary(id: string): Promise<ChatType | null> {
   try {
@@ -116,6 +124,15 @@ export async function addSummary({ url, user_id }: { url: string; user_id: strin
   });
   
   debugLog(`Summary created with ID: ${chat.id}`);
+  
+  // Revalidate the cache after adding a new summary
+  try {
+    const { revalidateTag } = await import('next/cache');
+    revalidateTag('user-summaries');
+  } catch (error) {
+    console.error('Failed to revalidate cache:', error);
+  }
+  
   return chat;
 }
 
