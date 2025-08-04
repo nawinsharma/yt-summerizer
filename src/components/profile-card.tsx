@@ -9,10 +9,10 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Check, Clock, Mail, MapPin, Shield } from "lucide-react"
-import { useUser } from "@/context/UserContext"
+import { useUserStore } from "@/store/userStore"
 
 export default function ProfileCard() {
-   const user = useUser();
+   const user = useUserStore((state) => state.user);
    return (
       <Card className="overflow-hidden">
          <CardHeader className="relative p-0">

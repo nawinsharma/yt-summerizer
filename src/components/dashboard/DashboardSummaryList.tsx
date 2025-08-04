@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import OldSummaryCard from "./OldSummaryCard";
 import UrlInput from "./UrlInput";
 import LoadingSpinner from "../common/LoadingSpinner";
@@ -7,16 +7,22 @@ import { getUserOldSummaries } from "@/actions/fetchActions";
 import { User } from "@/lib/types";
 import { UserSummaries } from "@/types";
 
-export default function DashboardSummaryList({ user }: { user: User }) {
-  const [summaries, setSummaries] = useState<UserSummaries[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function DashboardSummaryList({ 
+  user, 
+  initialSummaries = [] 
+}: { 
+  user: User;
+  initialSummaries?: UserSummaries[];
+}) {
+  const [summaries, setSummaries] = useState<UserSummaries[]>(initialSummaries);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSummaries = useCallback(async () => {
     try {
       setError(null);
+      setLoading(true);
       
-      // Add null check for user and user.id
       if (!user || !user.id) {
         console.error('DashboardSummaryList: Invalid user data');
         setError('Invalid user data. Please sign in again.');
@@ -33,35 +39,16 @@ export default function DashboardSummaryList({ user }: { user: User }) {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user]);
 
-  useEffect(() => {
-    // Check if user exists before proceeding
-    if (!user || !user.id) {
-      setError('Invalid user data. Please sign in again.');
-      setLoading(false);
-      return;
-    }
-    
-    // Add a small delay to prevent flash of loading state
-    const timer = setTimeout(() => {
-      fetchSummaries();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [fetchSummaries, user]);
-
-  // Called when a new summary is added
   const handleSummaryAdded = (newSummary: UserSummaries) => {
     setSummaries((prev) => [newSummary, ...prev]);
   };
 
-  // Remove a summary from the list by id
   const handleSummaryDeleted = (id: string) => {
     setSummaries((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Early return for invalid user
   if (!user || !user.id) {
     return (
       <div className="container flex flex-col items-center justify-center mx-auto">

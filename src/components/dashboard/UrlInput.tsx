@@ -41,7 +41,7 @@ export default function UrlInput({ user, onSummaryAdded }: { user: { id: string 
         <Input
           type="text"
           className="h-14 rounded-full border-2 border-blue-400 shadow-lg px-12 pr-16 w-full text-lg font-semibold text-gray-100 placeholder-gray-200 outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-500 transition-all"
-          placeholder="🔍 Search or paste your YouTube URL…"
+          placeholder="paste correct YouTube URL…"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           disabled={loading}

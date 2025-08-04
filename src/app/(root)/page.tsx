@@ -127,7 +127,7 @@ function Home() {
 						<MagicBadge title="Features" />
 						<h2 className="!leading-[1.1] mt-6 text-center font-heading font-medium text-3xl text-foreground md:text-5xl lg:text-center">
 							Tired of watching, <br className="hidden sm:block" />
-							long ass videos?
+							long videos?
 						</h2>
 						<p className="mt-4 max-w-lg text-center text-lg text-muted-foreground lg:text-center">
 							SumTub allows you to summarize YouTube videos in seconds without missing out on the key points or context.

@@ -2,6 +2,14 @@ import React from "react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import DashboardSummaryList from "@/components/dashboard/DashboardSummaryList";
+import { getUserOldSummaries } from "@/actions/fetchActions";
+import UserInitializer from "@/components/dashboard/UserInitializer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Dashboard - YouTube Summarizer',
+  description: 'View and manage your YouTube video summaries',
+};
 
 export default async function dashboard() {
   try {
@@ -26,11 +34,17 @@ export default async function dashboard() {
         </div>
       );
     }
+
+    // Fetch summaries on the server
+    const summaries = await getUserOldSummaries(user.id);
     
     return (
-      <div className="container flex flex-col items-center justify-center mx-auto">
-        <DashboardSummaryList user={user} />
-      </div>
+      <>
+        <UserInitializer user={user} />
+        <div className="container flex flex-col items-center justify-center mx-auto">
+          <DashboardSummaryList user={user} initialSummaries={summaries} />
+        </div>
+      </>
     );
   } catch (error) {
     console.error('Dashboard page error:', error);
