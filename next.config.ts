@@ -6,7 +6,17 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         hostname: "ik.imagekit.io",
+        protocol: "https",
+        port: "",
+        pathname: "/**",
       },
+      {
+        hostname: "lh3.googleusercontent.com",
+        protocol: "https",
+        port: "",
+        pathname: "/**",
+      },
+
     ],
   },
 };
